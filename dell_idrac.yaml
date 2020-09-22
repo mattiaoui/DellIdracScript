@@ -1,0 +1,84 @@
+##ANSIBLE PLAYBOOK CONFIGURATION IDRAC SETTINGS
+###CHANGE VALUE UNDER "VARS" WITH CUSTOMER PARAMETER
+####CREATE BY MATTIA MARAGNO
+- hosts: hosts
+  connection: local
+  name: Configure the iDRAC services attributes
+  gather_facts: False
+  vars:
+    snmp_community_name: "9b26e0e01921CAR"
+    ntp_setup_idrac_timezone: "Europe/Rome"
+    ntp_server_1: "1.2.3.4"
+    ntp_server_2: "1.2.3.5"
+    smpt_address_1: "ict@mydomain.com"
+    smpt_alert_number_1: "1"
+    #smpt_address_2: "pippo@pippo.com"
+    #smpt_alert_number_2: "2"
+    smtp_ip_address: "1.2.3.40"
+    smtp_port: "25"
+    internal_domain: "mydomain.com"
+    set_static_dns_1: "1.2.3.4"
+    set_static_dns_2: "1.2.3.5"
+
+##ENABLE SMNP AND SET COMMUNITY NAME
+  tasks:
+  - name: Setup iDRAC SNMP
+    dellemc_configure_idrac_services:
+       idrac_ip:   "{{ idrac_ip }}"
+       idrac_user: "{{ idrac_user }}"
+       idrac_password:  "{{ idrac_password }}"
+       share_name: "{{ playbook_dir }}"
+       snmp_enable: "Enabled"
+       snmp_protocol: "All"
+       community_name: "{{ snmp_community_name }}"
+
+    tags:
+       - idrac_snmp
+
+##ENABLE NTP - SET NTP SERVER AND CHANGE TIMEZONE
+  - name: Setup iDRAC Timezone
+    dellemc_configure_idrac_timezone:
+       idrac_ip:   "{{ idrac_ip }}"
+       idrac_user: "{{ idrac_user }}"
+       idrac_password:  "{{ idrac_password }}"
+       share_name: "{{ playbook_dir }}"
+       setup_idrac_timezone: "{{ ntp_setup_idrac_timezone }}"
+       enable_ntp: "Enabled"
+       ntp_server_1: "{{ ntp_server_1 }}"
+       ntp_server_2: "{{ ntp_server_2 }}"
+
+    tags:
+      - idrac_timezone
+
+##ENABLE EMAIL EVENT
+  - name: Setup iDRAC SMTP Server
+    dellemc_configure_idrac_eventing:
+       idrac_ip:   "{{ idrac_ip }}"
+       idrac_user: "{{ idrac_user }}"
+       idrac_password:  "{{ idrac_password }}"
+       share_name: "{{ playbook_dir }}"
+       email_alert_state: "Enabled"
+       enable_alerts: "Enabled"
+       address: "{{ smpt_address_1 }}"
+       alert_number: "{{ smpt_alert_number_1 }}"
+       #address: "{{ smpt_address_2 }}"
+       #alert_number: "{{ smpt_alert_number_2 }}"
+       custom_message: "Alert From iDrac"
+       smtp_ip_address: "{{ smtp_ip_address }}"
+       smtp_port: "{{ smtp_port }}"
+
+    tags:
+      - idrac_smtp
+
+##SETTING DNS SERVER
+  - name: Setup iDRAC DNS Server iDRAC
+    dellemc_configure_idrac_network:
+       idrac_ip:   "{{ idrac_ip }}"
+       idrac_user: "{{ idrac_user }}"
+       idrac_password:  "{{ idrac_password }}"
+       share_name: "{{ playbook_dir }}"
+       register_idrac_on_dns: "Disabled"
+       auto_config: "Disabled"
+       static_dns: "{{ internal_domain }}"
+       static_dns_1: "{{ set_static_dns_1 }}"
+       static_dns_2: "{{ set_static_dns_2 }}"
