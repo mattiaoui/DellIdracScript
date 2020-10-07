@@ -82,3 +82,15 @@
        static_dns: "{{ internal_domain }}"
        static_dns_1: "{{ set_static_dns_1 }}"
        static_dns_2: "{{ set_static_dns_2 }}"
+
+##EXECUTE FIRMWARE UPGRADE
+  tasks:
+  - name: Update firmware from repository on a HTTP/HTTP/FTP repository
+    idrac_firmware:
+       idrac_ip: "{{ idrac_ip }}"
+       idrac_user: "{{ idrac_user }}"
+       idrac_password: "{{ idrac_password}}"
+       share_name: "https://downloads.dell.com"
+       reboot: True
+       job_wait: True
+       apply_update: True
