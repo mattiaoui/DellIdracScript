@@ -1,0 +1,2 @@
+[hosts]
+svresx01-idrac idrac_ip='xxx.xxx.xxx.xxx' idrac_user='root' idrac_password='ROOT_IDRAC_PASSWORD'
